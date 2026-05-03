@@ -22,6 +22,9 @@ dev = [
     "types-requests",
 ]
 
+[tool.setuptools]
+packages = ["core"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
