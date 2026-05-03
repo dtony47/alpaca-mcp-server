@@ -10,6 +10,8 @@ from typing import Literal
 Venue = Literal["alpaca", "solana"]
 Leg = Literal["majors", "meme"]
 Side = Literal["buy", "sell"]
+KillSwitchState = Literal["ACTIVE", "PAUSED", "KILLED"]
+Phase = Literal["paper", "live_25", "live_50", "live_100"]
 
 
 @dataclass(frozen=True)

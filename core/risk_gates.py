@@ -7,7 +7,7 @@ is on, we don't care about the rest.
 Every gate function is independently testable and reusable.
 """
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from core.types import AccountState, GateResult, OrderIntent
 
@@ -18,10 +18,16 @@ VALID_PHASES = {"paper", "live_25", "live_50", "live_100"}
 def check_kill_switch(state: str) -> GateResult:
     if state == "ACTIVE":
         return GateResult(passed=True, gate_name="kill_switch", reason=None)
+    if state in VALID_KILL_SWITCH_STATES:
+        return GateResult(
+            passed=False,
+            gate_name="kill_switch",
+            reason=f"Kill switch is {state}; new entries blocked",
+        )
     return GateResult(
         passed=False,
         gate_name="kill_switch",
-        reason=f"Kill switch is {state}; new entries blocked",
+        reason=f"Unknown kill switch state '{state}' (corrupted state file?); failing closed",
     )
 
 
@@ -37,26 +43,58 @@ def check_phase_valid(phase: str) -> GateResult:
 
 def check_daily_loss_limit(day_pl_pct: Decimal, limit_pct: Decimal) -> GateResult:
     """Day P&L must be > -limit_pct (i.e. losses smaller than limit)."""
-    if day_pl_pct > -limit_pct:
-        return GateResult(passed=True, gate_name="daily_loss_limit", reason=None)
-    return GateResult(
-        passed=False,
-        gate_name="daily_loss_limit",
-        reason=f"Day P&L {day_pl_pct:.2%} exceeds limit -{limit_pct:.2%}",
-    )
+    if limit_pct < 0:
+        return GateResult(
+            passed=False,
+            gate_name="daily_loss_limit",
+            reason=f"invalid limit_pct {limit_pct} (must be non-negative)",
+        )
+    try:
+        if day_pl_pct > -limit_pct:
+            return GateResult(passed=True, gate_name="daily_loss_limit", reason=None)
+        return GateResult(
+            passed=False,
+            gate_name="daily_loss_limit",
+            reason=f"Day P&L {day_pl_pct:.2%} exceeds limit -{limit_pct:.2%}",
+        )
+    except (InvalidOperation, ArithmeticError) as e:
+        return GateResult(
+            passed=False,
+            gate_name="daily_loss_limit",
+            reason=f"invalid input (NaN/arithmetic): {e}",
+        )
 
 
 def check_drawdown_limit(phase_pl_pct: Decimal, limit_pct: Decimal) -> GateResult:
-    if phase_pl_pct > -limit_pct:
-        return GateResult(passed=True, gate_name="drawdown_limit", reason=None)
-    return GateResult(
-        passed=False,
-        gate_name="drawdown_limit",
-        reason=f"Phase drawdown {phase_pl_pct:.2%} exceeds limit -{limit_pct:.2%}",
-    )
+    if limit_pct < 0:
+        return GateResult(
+            passed=False,
+            gate_name="drawdown_limit",
+            reason=f"invalid limit_pct {limit_pct} (must be non-negative)",
+        )
+    try:
+        if phase_pl_pct > -limit_pct:
+            return GateResult(passed=True, gate_name="drawdown_limit", reason=None)
+        return GateResult(
+            passed=False,
+            gate_name="drawdown_limit",
+            reason=f"Phase drawdown {phase_pl_pct:.2%} exceeds limit -{limit_pct:.2%}",
+        )
+    except (InvalidOperation, ArithmeticError) as e:
+        return GateResult(
+            passed=False,
+            gate_name="drawdown_limit",
+            reason=f"invalid input (NaN/arithmetic): {e}",
+        )
 
 
 def check_position_count(current: int, max_allowed: int) -> GateResult:
+    if current < 0 or max_allowed < 0:
+        return GateResult(
+            passed=False,
+            gate_name="position_count",
+            reason=f"invalid inputs (negative): current={current}, max={max_allowed}",
+        )
     if current < max_allowed:
         return GateResult(passed=True, gate_name="position_count", reason=None)
     return GateResult(
@@ -69,27 +107,59 @@ def check_position_count(current: int, max_allowed: int) -> GateResult:
 def check_position_size(
     intended_cost_usd: Decimal, equity: Decimal, max_pct: Decimal
 ) -> GateResult:
-    max_cost = equity * max_pct
-    if intended_cost_usd <= max_cost:
-        return GateResult(passed=True, gate_name="position_size", reason=None)
-    return GateResult(
-        passed=False,
-        gate_name="position_size",
-        reason=f"Intended ${intended_cost_usd} exceeds max ${max_cost} ({max_pct:.0%} of equity)",
-    )
+    try:
+        if intended_cost_usd < 0 or equity <= 0 or max_pct < 0:
+            return GateResult(
+                passed=False,
+                gate_name="position_size",
+                reason=f"invalid inputs: intended={intended_cost_usd}, equity={equity}, max_pct={max_pct}",
+            )
+        max_cost = equity * max_pct
+        if intended_cost_usd <= max_cost:
+            return GateResult(passed=True, gate_name="position_size", reason=None)
+        return GateResult(
+            passed=False,
+            gate_name="position_size",
+            reason=f"Intended ${intended_cost_usd} exceeds max ${max_cost} ({max_pct:.0%} of equity)",
+        )
+    except (InvalidOperation, ArithmeticError) as e:
+        return GateResult(
+            passed=False,
+            gate_name="position_size",
+            reason=f"invalid input (NaN/arithmetic): {e}",
+        )
 
 
 def check_available_cash(intended_cost_usd: Decimal, available: Decimal) -> GateResult:
-    if intended_cost_usd <= available:
-        return GateResult(passed=True, gate_name="available_cash", reason=None)
-    return GateResult(
-        passed=False,
-        gate_name="available_cash",
-        reason=f"Intended ${intended_cost_usd} exceeds available ${available}",
-    )
+    try:
+        if intended_cost_usd < 0 or available < 0:
+            return GateResult(
+                passed=False,
+                gate_name="available_cash",
+                reason=f"invalid inputs: intended={intended_cost_usd}, available={available}",
+            )
+        if intended_cost_usd <= available:
+            return GateResult(passed=True, gate_name="available_cash", reason=None)
+        return GateResult(
+            passed=False,
+            gate_name="available_cash",
+            reason=f"Intended ${intended_cost_usd} exceeds available ${available}",
+        )
+    except (InvalidOperation, ArithmeticError) as e:
+        return GateResult(
+            passed=False,
+            gate_name="available_cash",
+            reason=f"invalid input (NaN/arithmetic): {e}",
+        )
 
 
 def check_rate_limit(trades_last_hour: int, max_per_hour: int) -> GateResult:
+    if trades_last_hour < 0 or max_per_hour < 0:
+        return GateResult(
+            passed=False,
+            gate_name="rate_limit",
+            reason=f"invalid inputs: trades={trades_last_hour}, max={max_per_hour}",
+        )
     if trades_last_hour < max_per_hour:
         return GateResult(passed=True, gate_name="rate_limit", reason=None)
     return GateResult(
