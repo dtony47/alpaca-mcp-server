@@ -10,10 +10,7 @@ Every gate function is independently testable and reusable.
 from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 
-from core.types import AccountState, GateResult, OrderIntent
-
-VALID_KILL_SWITCH_STATES = {"ACTIVE", "PAUSED", "KILLED"}
-VALID_PHASES = {"paper", "live_25", "live_50", "live_100"}
+from core.types import VALID_KILL_SWITCH_STATES, VALID_PHASES, AccountState, GateResult, OrderIntent
 
 
 def check_kill_switch(state: str) -> GateResult:

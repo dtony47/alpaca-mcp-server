@@ -105,3 +105,16 @@ def test_meme_sizing_rejects_zero_pool():
             max_position_pct=Decimal("0.03"),
             max_pool_pct=Decimal("0.005"),
         )
+
+
+def test_meme_sizing_rejects_negative_inputs():
+    """Verifies the negative-input guard in position_size_meme is reachable."""
+    # pool_liquidity is positive (so the first guard passes), but equity is negative
+    with pytest.raises(ValueError):
+        position_size_meme(
+            equity=Decimal("-1"),
+            available_cash=Decimal("100"),
+            pool_liquidity_usd=Decimal("10000"),
+            max_position_pct=Decimal("0.03"),
+            max_pool_pct=Decimal("0.005"),
+        )

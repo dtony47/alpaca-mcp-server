@@ -5,13 +5,16 @@ These are pure dataclasses with no logic. All money values use Decimal.
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, get_args
 
 Venue = Literal["alpaca", "solana"]
 Leg = Literal["majors", "meme"]
 Side = Literal["buy", "sell"]
 KillSwitchState = Literal["ACTIVE", "PAUSED", "KILLED"]
 Phase = Literal["paper", "live_25", "live_50", "live_100"]
+
+VALID_KILL_SWITCH_STATES: frozenset[str] = frozenset(get_args(KillSwitchState))
+VALID_PHASES: frozenset[str] = frozenset(get_args(Phase))
 
 
 @dataclass(frozen=True)

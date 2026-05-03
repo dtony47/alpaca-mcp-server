@@ -11,9 +11,7 @@ from datetime import date
 from pathlib import Path
 from typing import cast
 
-from core.types import KillSwitchState
-
-VALID_STATES: set[KillSwitchState] = {"ACTIVE", "PAUSED", "KILLED"}
+from core.types import VALID_KILL_SWITCH_STATES, KillSwitchState
 
 _STATE_LINE = re.compile(r"^State:\s*(\w+)\s*$", re.MULTILINE)
 _HISTORY_HEADER = re.compile(r"^History:\s*$", re.MULTILINE)
@@ -31,7 +29,7 @@ def current_state(path: Path) -> KillSwitchState:
         return "KILLED"
 
     value = match.group(1).strip().upper()
-    if value in VALID_STATES:
+    if value in VALID_KILL_SWITCH_STATES:
         return cast(KillSwitchState, value)
     return "KILLED"
 
@@ -42,8 +40,8 @@ def set_state(path: Path, new_state: str, reason: str) -> None:
     Raises ValueError if new_state is not a valid state or reason is empty.
     The write is atomic (write-temp-then-rename) to protect the audit log.
     """
-    if new_state not in VALID_STATES:
-        raise ValueError(f"Invalid state '{new_state}'; valid: {sorted(VALID_STATES)}")
+    if new_state not in VALID_KILL_SWITCH_STATES:
+        raise ValueError(f"Invalid state '{new_state}'; valid: {sorted(VALID_KILL_SWITCH_STATES)}")
 
     if not reason.strip():
         raise ValueError("reason is required (cannot be empty)")
