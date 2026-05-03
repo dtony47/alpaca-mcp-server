@@ -23,3 +23,5 @@
 - memory/RESEARCH-LOG.md (tail)
 - memory/KILL-SWITCH.md
 - memory/PHASE.md
+- memory/MEMECOIN-WATCHLIST.md (memecoin scanner only)
+- memory/WEEKLY-REVIEW.md (weekly review routine; useful context for daily research)

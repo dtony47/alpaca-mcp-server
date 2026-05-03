@@ -21,9 +21,11 @@ Template:
 
 ### Closed Trades
 | Ticker | Entry | Exit | P&L | Notes |
+|---|---|---|---|---|
 
 ### Open Positions at Week End
 | Ticker | Entry | Close | Unrealized | Stop |
+|---|---|---|---|---|
 
 ### What Worked
 - ...

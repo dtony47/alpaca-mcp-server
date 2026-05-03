@@ -21,16 +21,21 @@ Multi-leg crypto trading bot. Beat a 60/40 BTC/ETH benchmark over the challenge 
 6. Never tighten within 3% of current price; never move a stop down
 7. Memecoin take-profit ladder: sell 25% at +50%, +100%, +200%; hold last 25% on trail
 8. Memecoin liquidity-drain exit: pool down >30% from entry → exit immediately
-9. Patience > activity. A day with zero trades is fine.
+9. Memecoin holder-spike exit: top-10 holder concentration jumps by >5pp since entry → exit (insider-dump signal)
+10. Patience > activity. A day with zero trades is fine.
 
 ## Position Limits
 - Max majors positions: 6 (max 20% per position)
 - Max meme positions: 10 (max 2-3% per position)
 - Max trades per hour: majors 5, meme 20
 
-## Kill Switches
-- Daily P&L < -5% → 24h pause on new entries
-- Phase drawdown > -20% → halt; manual reset required
+## Pre-trade gates (entry-blocking thresholds — see core/risk_gates.py)
+- Phase-to-date drawdown ≥ -15% → block new entries (existing positions still managed)
+- Day P&L (realized + unrealized) ≥ -3% of equity → block new entries
+
+## Kill Switches (auto-pause / auto-halt — see core/kill_switch.py)
+- Day P&L (realized + unrealized) ≤ -5% of equity → auto-pause new entries for 24h
+- Phase-to-date drawdown ≤ -20% → auto-halt; manual reset required (edit KILL-SWITCH.md)
 - 3 consecutive memecoin losses → 24h pause on memecoin leg
 - `KILL-SWITCH.md == KILLED` → halt everything within one tick
 
@@ -45,4 +50,4 @@ Multi-leg crypto trading bot. Beat a 60/40 BTC/ETH benchmark over the challenge 
 - Honeypot.is PASS
 - Estimated slippage < 3%
 - Position size ≤ 0.5% of pool liquidity
-- LLM research pass not RED_FLAG
+- LLM research pass: not `RED_FLAG` and not `INSUFFICIENT_DATA`
