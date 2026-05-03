@@ -7,6 +7,7 @@ is on, we don't care about the rest.
 Every gate function is independently testable and reusable.
 """
 
+from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 
 from core.types import AccountState, GateResult, OrderIntent
@@ -185,7 +186,7 @@ def run_universal_gates(
     Returns list of GateResult; if any fail, the trade is rejected.
     The list always contains at least one element. If empty, that's a bug.
     """
-    gates = [
+    gates: list[Callable[[], GateResult]] = [
         lambda: check_kill_switch(kill_switch_state),
         lambda: check_phase_valid(phase),
         lambda: check_daily_loss_limit(state.day_pl_pct, daily_loss_limit_pct),

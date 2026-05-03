@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
@@ -8,7 +8,7 @@ from core.audit import TradeRecord, log_trade
 def make_record(trade_id: str = "t1") -> TradeRecord:
     return TradeRecord(
         trade_id=trade_id,
-        timestamp=datetime(2026, 5, 3, 14, 30, tzinfo=timezone.utc),
+        timestamp=datetime(2026, 5, 3, 14, 30, tzinfo=UTC),
         leg="majors",
         venue="alpaca",
         symbol="BTC/USD",

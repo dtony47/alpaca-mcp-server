@@ -128,5 +128,5 @@ def test_send_falls_back_when_telegram_returns_non_200(monkeypatch, fallback_pat
 
 def test_notification_result_is_immutable():
     r = NotificationResult(success=True, delivered_via="file", error=None)
-    with pytest.raises(Exception):
+    with pytest.raises((AttributeError, TypeError)):
         r.success = False  # type: ignore[misc]

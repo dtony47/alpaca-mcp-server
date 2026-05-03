@@ -13,8 +13,7 @@ from core.risk_gates import (
     check_rate_limit,
     run_universal_gates,
 )
-from core.types import AccountState, OrderIntent, KillSwitchState, Phase
-
+from core.types import AccountState, OrderIntent
 
 # ---------- shared fixtures ----------
 

@@ -4,7 +4,6 @@ import pytest
 
 from core.sizing import position_size_majors, position_size_meme
 
-
 # ---------- majors ----------
 
 def test_majors_sizing_simple_pct():

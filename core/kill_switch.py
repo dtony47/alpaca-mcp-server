@@ -9,6 +9,7 @@ import os
 import re
 from datetime import date
 from pathlib import Path
+from typing import cast
 
 from core.types import KillSwitchState
 
@@ -31,7 +32,7 @@ def current_state(path: Path) -> KillSwitchState:
 
     value = match.group(1).strip().upper()
     if value in VALID_STATES:
-        return value  # type: ignore[return-value]
+        return cast(KillSwitchState, value)
     return "KILLED"
 
 

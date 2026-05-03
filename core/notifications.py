@@ -5,7 +5,7 @@ and returns success=True (the message is preserved).
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -58,7 +58,7 @@ def send(
 
 def _append_to_fallback(message: str, urgency: Urgency, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     entry = f"\n## {stamp} [{urgency}]\n{message}\n"
     with path.open("a", encoding="utf-8") as f:
         f.write(entry)
