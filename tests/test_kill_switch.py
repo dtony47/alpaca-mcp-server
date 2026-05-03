@@ -135,3 +135,41 @@ def test_should_auto_pause_meme_loss_streak_triggers():
         meme_loss_pause_threshold=3,
     )
     assert pause is True and "meme" in (reason or "").lower()
+
+
+def test_set_state_rejects_empty_reason(tmp_path: Path):
+    p = tmp_path / "KILL-SWITCH.md"
+    p.write_text("State: ACTIVE\n")
+    with pytest.raises(ValueError, match="reason"):
+        set_state(p, new_state="PAUSED", reason="")
+
+
+def test_set_state_rejects_whitespace_only_reason(tmp_path: Path):
+    p = tmp_path / "KILL-SWITCH.md"
+    p.write_text("State: ACTIVE\n")
+    with pytest.raises(ValueError, match="reason"):
+        set_state(p, new_state="PAUSED", reason="   \n\t  ")
+
+
+def test_set_state_does_not_treat_substring_history_as_header(tmp_path: Path):
+    """A reason mentioning 'History:' shouldn't fool the History-section detector."""
+    p = tmp_path / "KILL-SWITCH.md"
+    # File has no real History header, but body text contains "History:"
+    p.write_text("# Kill Switch\n\nState: ACTIVE\n\nNote: see History: archive\n")
+    set_state(p, new_state="PAUSED", reason="test transition")
+    content = p.read_text()
+    # A new History: header must have been added (because no real one existed)
+    assert content.count("History:") == 2  # one in body text, one as new header
+    # The new history line should be under a real header, not glued onto the prose
+    history_section_index = content.rfind("History:\n")
+    history_line_index = content.rfind("- ")
+    assert history_section_index < history_line_index
+
+
+def test_set_state_atomicity_no_temp_file_left_on_success(tmp_path: Path):
+    """After a successful write, the .tmp file should not exist."""
+    p = tmp_path / "KILL-SWITCH.md"
+    p.write_text("State: ACTIVE\n")
+    set_state(p, new_state="PAUSED", reason="test")
+    tmp_files = list(tmp_path.glob("*.tmp"))
+    assert len(tmp_files) == 0

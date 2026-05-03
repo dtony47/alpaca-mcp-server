@@ -5,15 +5,17 @@ memory/KILL-SWITCH.md as a parseable markdown file. If the file is
 missing or unparseable, we fail-safe to KILLED.
 """
 
+import os
 import re
 from datetime import date
 from pathlib import Path
-from typing import Literal
 
-KillSwitchState = Literal["ACTIVE", "PAUSED", "KILLED"]
+from core.types import KillSwitchState
+
 VALID_STATES: set[KillSwitchState] = {"ACTIVE", "PAUSED", "KILLED"}
 
 _STATE_LINE = re.compile(r"^State:\s*(\w+)\s*$", re.MULTILINE)
+_HISTORY_HEADER = re.compile(r"^History:\s*$", re.MULTILINE)
 
 
 def current_state(path: Path) -> KillSwitchState:
@@ -36,10 +38,14 @@ def current_state(path: Path) -> KillSwitchState:
 def set_state(path: Path, new_state: str, reason: str) -> None:
     """Write a new kill-switch state to path, appending a history entry.
 
-    Raises ValueError if new_state is not a valid state.
+    Raises ValueError if new_state is not a valid state or reason is empty.
+    The write is atomic (write-temp-then-rename) to protect the audit log.
     """
     if new_state not in VALID_STATES:
         raise ValueError(f"Invalid state '{new_state}'; valid: {sorted(VALID_STATES)}")
+
+    if not reason.strip():
+        raise ValueError("reason is required (cannot be empty)")
 
     today = date.today().isoformat()
 
@@ -54,14 +60,19 @@ def set_state(path: Path, new_state: str, reason: str) -> None:
         # No State line existed; append one
         new_content = content.rstrip() + f"\n\nState: {new_state}\n\nHistory:\n"
 
-    # Append history line if "History:" header exists; else add one
+    # Append history line if a real History: header exists; else add one.
+    # Use anchored regex to avoid matching "History:" embedded in body text.
     history_line = f"- {today}: {new_state} — {reason}\n"
-    if "History:" in new_content:
+    if _HISTORY_HEADER.search(new_content):
         new_content = new_content.rstrip() + "\n" + history_line
     else:
         new_content = new_content.rstrip() + "\n\nHistory:\n" + history_line
 
-    path.write_text(new_content, encoding="utf-8")
+    # Atomic write: write to a .tmp sibling then rename so a mid-write crash
+    # cannot corrupt the audit log.
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(new_content, encoding="utf-8")
+    os.replace(tmp_path, path)  # atomic on POSIX and Windows
 
 
 def should_auto_pause(
@@ -74,8 +85,11 @@ def should_auto_pause(
 ) -> tuple[bool, str | None]:
     """Decide whether the bot should auto-pause itself.
 
-    Inputs are signed percentages: -0.05 == -5%.
-    Thresholds are positive magnitudes: 0.05 == "pause when loss exceeds 5%".
+    Inputs are signed percentages (dimensionless ratios), not money values —
+    `float` is intentional and consistent with the rest of the percentage-handling
+    code paths. Money math elsewhere uses `Decimal`.
+
+    -0.05 == -5%. Thresholds are positive magnitudes: 0.05 == "pause when loss exceeds 5%".
     """
     if day_pl_pct_signed <= -daily_pause_threshold:
         return True, f"daily loss {day_pl_pct_signed:.2%} ≤ -{daily_pause_threshold:.2%}"
