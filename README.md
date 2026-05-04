@@ -1,3 +1,41 @@
+# Crypto Trading Bot
+
+Multi-leg crypto trading bot:
+- **Majors leg** — BTC/ETH/SOL/DOGE/AVAX/LINK/UNI on Alpaca (CEX, paper or live).
+- **Memecoin leg** — Solana on-chain via Jupiter aggregator.
+
+Architecture: hybrid scheduled + always-on monitor. Memory in git. Risk gates enforced before every order.
+
+> **Spec:** `docs/superpowers/specs/2026-05-03-crypto-trading-bot-design.md`
+> **Foundation plan:** `docs/superpowers/plans/2026-05-03-foundation.md`
+
+## Status (foundation, Plan 1)
+
+- ✅ `core/` library: types, sizing, risk gates, kill switch, notifications, audit
+- ✅ Memory model (`memory/*.md`)
+- ✅ CLAUDE.md agent rulebook
+- ✅ CI (ruff + mypy + pytest with coverage gates)
+- ⏳ Plan 2: Majors leg on Alpaca paper
+- ⏳ Plan 3: Memecoin leg on Solana
+- ⏳ Plan 4: Always-on monitor on Fly.io
+- ⏳ Plan 5: LLM routines (Claude Code cloud)
+- ⏳ Plan 6: Phase 1 ops + go-live gate
+
+## Quickstart (development)
+
+````bash
+cd Alpaca
+cp env.template .env  # then fill in
+pip install -e ".[dev]"
+pytest
+````
+
+See `CLAUDE.md` for the full agent rulebook.
+
+---
+
+## Existing toolkit (preserved, integrated in Plan 2/3)
+
 # Alpaca Trading Toolkit
 
 Python toolkit for paper trading with Alpaca, enriched with Polygon market data, news sentiment, and DEX/Web3 token analysis.

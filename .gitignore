@@ -7,3 +7,49 @@ __pycache__/
 *.db-shm
 *.db-wal
 .claude/
+
+# Secrets — never commit
+.env.*
+!env.template
+*.key
+*.pem
+wallet.json
+keypair.json
+solana-keypair.json
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Local DB / state
+*.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Notifications fallback (local only, ephemeral)
+memory/NOTIFICATIONS.md
+
+# Build artifacts
+dist/
+build/
+*.whl
+*.tar.gz
