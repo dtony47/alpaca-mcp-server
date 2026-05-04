@@ -1,0 +1,13 @@
+{
+  "id": "abcd1234-1111-2222-3333-555566667777",
+  "client_order_id": "majors-BTC/USD-2026-05-04T15:00:00Z-stop",
+  "status": "accepted",
+  "symbol": "BTC/USD",
+  "side": "sell",
+  "qty": "0.01666666",
+  "type": "stop_limit",
+  "stop_price": "55800.00",
+  "limit_price": "55700.00",
+  "time_in_force": "gtc",
+  "created_at": "2026-05-04T15:00:03Z"
+}

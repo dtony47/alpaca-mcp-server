@@ -1,0 +1,66 @@
+name: majors-scanner
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: majors-scanner
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_BASE_URL: https://paper-api.alpaca.markets
+      ALPACA_DATA_URL: https://data.alpaca.markets
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      DAILY_LOSS_LIMIT_PCT: '0.03'
+      PHASE_DRAWDOWN_LIMIT_PCT: '0.15'
+      MAX_POSITIONS_MAJORS: '6'
+      MAX_POSITION_PCT_MAJORS: '0.20'
+      RATE_LIMIT_TRADES_PER_HOUR_MAJORS: '5'
+      MAX_SPREAD_PCT_MAJORS: '0.005'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Read kill switch
+        id: ks
+        run: |
+          state=$(awk '/^State:/ {print $2; found=1} END {if (!found) print "KILLED"}' memory/KILL-SWITCH.md 2>/dev/null || echo "KILLED")
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          echo "kill switch is $state"
+
+      - name: Run scanner
+        if: steps.ks.outputs.state == 'ACTIVE'
+        run: python -m majors.scanner
+
+      - name: Commit memory updates if any
+        run: |
+          git config user.name "majors-scanner-bot"
+          git config user.email "bot@example.com"
+          if [[ -n "$(git status --porcelain memory/)" ]]; then
+            git add memory/
+            git commit -m "scanner: tick $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin HEAD:main
+          else
+            echo "no memory changes"
+          fi

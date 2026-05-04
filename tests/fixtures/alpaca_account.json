@@ -1,0 +1,11 @@
+{
+  "account_number": "PA000000001",
+  "status": "ACTIVE",
+  "currency": "USD",
+  "equity": "100000.50",
+  "cash": "100000.50",
+  "buying_power": "100000.50",
+  "portfolio_value": "100000.50",
+  "trading_blocked": false,
+  "transfers_blocked": false
+}

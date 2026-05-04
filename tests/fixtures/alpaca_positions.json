@@ -1,0 +1,11 @@
+[
+  {
+    "symbol": "BTC/USD",
+    "asset_class": "crypto",
+    "qty": "0.01234567",
+    "avg_entry_price": "60000.00",
+    "current_price": "62500.00",
+    "unrealized_plpc": "0.04166667",
+    "side": "long"
+  }
+]

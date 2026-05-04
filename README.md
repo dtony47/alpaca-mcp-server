@@ -21,6 +21,33 @@ Architecture: hybrid scheduled + always-on monitor. Memory in git. Risk gates en
 - ⏳ Plan 5: LLM routines (Claude Code cloud)
 - ⏳ Plan 6: Phase 1 ops + go-live gate
 
+## Status (majors leg, Plan 2)
+
+- ✅ Alpaca CEX paper-trading leg shipped: scanner, executor, EOD, trail manager
+- ✅ Universe: BTC/USD, ETH/USD, SOL/USD, DOGE/USD, AVAX/USD, LINK/USD, UNI/USD
+- ✅ Hourly scanner + daily EOD via GitHub Actions
+- ✅ Daily LLM routines wired (`routines/`)
+- 🟡 Phase: `paper`. No real money.
+- 🟡 Plan 3 (memecoin leg) and Plan 4 (always-on monitor + live rollout) pending.
+
+### Run locally
+
+```bash
+# scan once
+python -m majors.scanner
+
+# write today's EOD
+python -m majors.eod
+```
+
+### Required GitHub Secrets
+
+Set these in repo Settings → Secrets and variables → Actions:
+
+- `ALPACA_API_KEY`, `ALPACA_SECRET_KEY`
+- `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
+- Plan 3: `HELIUS_API_KEY`, `BIRDEYE_API_KEY`, `GOPLUS_API_KEY`
+
 ## Quickstart (development)
 
 ````bash
