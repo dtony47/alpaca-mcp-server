@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
     "requests>=2.31",
     "python-dotenv>=1.0",
+    "pandas>=2.2",
 ]
 
 [project.optional-dependencies]
@@ -20,10 +21,11 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.8",
     "types-requests",
+    "pandas-stubs",
 ]
 
 [tool.setuptools]
-packages = ["core"]
+packages = ["core", "majors"]
 
 [tool.ruff]
 line-length = 100
