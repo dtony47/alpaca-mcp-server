@@ -67,6 +67,7 @@ def test_eod_writes_dated_section_with_positions(
         _position("ETH/USD", "0.10", "3500", "3458", "-0.01200000"),
     ]
     mocker.patch("majors.eod.AlpacaClient", return_value=client)
+    send_mock = mocker.patch("majors.eod.send")
 
     run_eod(_config(memory_dir), now=datetime(2026, 5, 4, 22, 0, 0))
 
@@ -78,6 +79,8 @@ def test_eod_writes_dated_section_with_positions(
     assert "ETH/USD" in log
     assert "+4.17%" in log
     assert "-1.20%" in log
+    send_mock.assert_called_once()
+    assert send_mock.call_args.kwargs["telegram_token"] is None
 
 
 def test_eod_handles_zero_positions(mocker: MockerFixture, memory_dir: Path) -> None:

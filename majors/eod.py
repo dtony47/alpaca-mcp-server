@@ -62,8 +62,8 @@ def run_eod(config: EodConfig, now: datetime | None = None) -> None:
     send(
         f"[majors-eod] {date_str}: equity ${account.equity}, {len(positions)} open",
         urgency="info",
-        telegram_token=config.telegram_token,
-        telegram_chat_id=config.telegram_chat_id,
+        telegram_token=None,
+        telegram_chat_id=None,
         fallback_path=config.memory_dir / "NOTIFICATIONS.md",
     )
 
