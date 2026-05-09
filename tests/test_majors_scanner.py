@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
+from majors.alpaca_client import AlpacaError
 from majors.scanner import ScannerConfig, ScanReport, run_scan
 
 
@@ -99,6 +100,7 @@ def test_scanner_bails_when_kill_switch_paused(
         encoding="utf-8",
     )
     client_class = mocker.patch("majors.scanner.AlpacaClient")
+    send_mock = mocker.patch("majors.scanner.send")
 
     report = run_scan(_config(memory_dir))
 
@@ -106,6 +108,8 @@ def test_scanner_bails_when_kill_switch_paused(
     assert report.aborted_reason == "kill_switch_PAUSED"
     assert report.entries_placed == 0
     client_class.assert_not_called()
+    send_mock.assert_called_once()
+    assert send_mock.call_args.kwargs["telegram_token"] is None
 
 
 def test_scanner_places_entry_on_buy_signal(mocker: MockerFixture, memory_dir: Path) -> None:
@@ -118,12 +122,15 @@ def test_scanner_places_entry_on_buy_signal(mocker: MockerFixture, memory_dir: P
     client.get_latest_quote.return_value = _quote()
     mocker.patch("majors.scanner.AlpacaClient", return_value=client)
     exec_mock = mocker.patch("majors.scanner.execute_buy")
+    send_mock = mocker.patch("majors.scanner.send")
 
     report = run_scan(_config(memory_dir), now=datetime(2026, 5, 4, 15, 0, tzinfo=UTC))
 
     assert report.entries_placed == 1
     assert report.entries_skipped_by_gate == 0
     exec_mock.assert_called_once()
+    send_mock.assert_called_once()
+    assert send_mock.call_args.kwargs["telegram_token"] is None
 
 
 def test_scanner_skips_when_spread_too_wide(
@@ -228,6 +235,7 @@ def test_scanner_tightens_trailing_stop_when_position_runs_up(
     client.get_bars.return_value = _bars()
     client.get_latest_quote.return_value = _quote()
     mocker.patch("majors.scanner.AlpacaClient", return_value=client)
+    send_mock = mocker.patch("majors.scanner.send")
 
     report = run_scan(_config(memory_dir), now=datetime(2026, 5, 4, 15, 0, tzinfo=UTC))
 
@@ -236,3 +244,30 @@ def test_scanner_tightens_trailing_stop_when_position_runs_up(
     client.place_stop_limit_sell.assert_called_once()
     new_stop_kwargs = client.place_stop_limit_sell.call_args.kwargs
     assert new_stop_kwargs["stop_price"] == Decimal("68400.00")
+    send_mock.assert_called_once()
+    assert send_mock.call_args.kwargs["telegram_token"] is None
+
+
+def test_scanner_dedupes_repeated_broker_read_failures(
+    mocker: MockerFixture,
+    memory_dir: Path,
+) -> None:
+    client = mocker.MagicMock()
+    client.get_account.side_effect = AlpacaError("HTTP 401: unauthorized")
+    mocker.patch("majors.scanner.AlpacaClient", return_value=client)
+    send_mock = mocker.patch("majors.scanner.send")
+
+    base = _config(memory_dir)
+    config = ScannerConfig(
+        **{**base.__dict__, "telegram_token": "token", "telegram_chat_id": "chat"}
+    )
+
+    first = run_scan(config, now=datetime(2026, 5, 4, 15, 0, tzinfo=UTC))
+    assert first.aborted_reason == "alpaca_read_error:HTTP 401: unauthorized"
+    send_mock.assert_called_once()
+    assert send_mock.call_args.kwargs["telegram_token"] == "token"
+
+    send_mock.reset_mock()
+    second = run_scan(config, now=datetime(2026, 5, 4, 16, 0, tzinfo=UTC))
+    assert second.aborted_reason == "alpaca_read_error:HTTP 401: unauthorized"
+    send_mock.assert_not_called()

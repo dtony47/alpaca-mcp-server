@@ -1,5 +1,6 @@
 """Cron entrypoint for the Alpaca majors leg."""
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -54,16 +55,17 @@ def run_scan(config: ScannerConfig, now: datetime | None = None) -> ScanReport:
     phase_path = config.memory_dir / "PHASE.md"
     monitor_log_path = config.memory_dir / "MONITOR-LOG.md"
     notifications_path = config.memory_dir / "NOTIFICATIONS.md"
+    alert_state_path = config.memory_dir / "MAJORS-SCANNER-ALERT-STATE.json"
     trade_log_path = config.memory_dir / "TRADE-LOG.md"
 
     kill_switch_state = current_state(kill_path)
     if kill_switch_state != "ACTIVE":
-        send(
-            f"[majors-scanner] kill switch is {kill_switch_state}; skipping tick",
+        _notify_scanner(
+            config=config,
+            message=f"[majors-scanner] kill switch is {kill_switch_state}; skipping tick",
             urgency="info",
-            telegram_token=config.telegram_token,
-            telegram_chat_id=config.telegram_chat_id,
             fallback_path=notifications_path,
+            deliver_to_telegram=False,
         )
         return ScanReport(
             aborted_reason=f"kill_switch_{kill_switch_state}",
@@ -85,12 +87,14 @@ def run_scan(config: ScannerConfig, now: datetime | None = None) -> ScanReport:
         positions = client.list_positions()
         open_orders = client.list_open_orders()
     except AlpacaError as exc:
-        send(
-            f"[majors-scanner] Alpaca read failed: {exc}",
-            urgency="alert",
-            telegram_token=config.telegram_token,
-            telegram_chat_id=config.telegram_chat_id,
+        _notify_scanner(
+            config=config,
+            message=f"[majors-scanner] Alpaca read failed: {exc}",
+            urgency="critical",
             fallback_path=notifications_path,
+            deliver_to_telegram=True,
+            alert_state_path=alert_state_path,
+            dedupe_key="alpaca_read_failed",
         )
         return ScanReport(
             aborted_reason=f"alpaca_read_error:{exc}",
@@ -116,15 +120,15 @@ def run_scan(config: ScannerConfig, now: datetime | None = None) -> ScanReport:
         errors=errors,
     )
 
-    send(
-        (
+    _notify_scanner(
+        config=config,
+        message=(
             f"[majors-scanner] entries={entries_placed} skipped={entries_skipped} "
             f"trails={trails_tightened} errors={len(errors)}"
         ),
-        urgency="alert" if errors else "info",
-        telegram_token=config.telegram_token,
-        telegram_chat_id=config.telegram_chat_id,
+        urgency="critical" if errors else "info",
         fallback_path=notifications_path,
+        deliver_to_telegram=(entries_placed > 0 or trails_tightened > 0),
     )
     return ScanReport(
         aborted_reason=None,
@@ -133,6 +137,57 @@ def run_scan(config: ScannerConfig, now: datetime | None = None) -> ScanReport:
         trails_tightened=trails_tightened,
         errors=errors,
     )
+
+
+def _notify_scanner(
+    *,
+    config: ScannerConfig,
+    message: str,
+    urgency: str,
+    fallback_path: Path,
+    deliver_to_telegram: bool,
+    alert_state_path: Path | None = None,
+    dedupe_key: str | None = None,
+) -> None:
+    if not deliver_to_telegram:
+        send(
+            message,
+            urgency=urgency,
+            telegram_token=None,
+            telegram_chat_id=None,
+            fallback_path=fallback_path,
+        )
+        return
+
+    if dedupe_key and alert_state_path is not None:
+        state = _load_alert_state(alert_state_path)
+        if state.get(dedupe_key) == message:
+            return
+        state[dedupe_key] = message
+        _write_alert_state(alert_state_path, state)
+
+    send(
+        message,
+        urgency=urgency,
+        telegram_token=config.telegram_token,
+        telegram_chat_id=config.telegram_chat_id,
+        fallback_path=fallback_path,
+    )
+
+
+def _load_alert_state(path: Path) -> dict[str, str]:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(raw, dict):
+        return {}
+    return {str(k): str(v) for k, v in raw.items()}
+
+
+def _write_alert_state(path: Path, state: dict[str, str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def _manage_trailing_stops(
