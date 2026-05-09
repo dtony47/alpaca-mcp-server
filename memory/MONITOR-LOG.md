@@ -8,3 +8,6 @@ Format:
 - per-action bullets describing the position, action, and reason
 
 Empty until the monitor is deployed (Plan 4).
+
+## 2026-05-09T10:25:00.198217+00:00 - ETH/USD skipped
+- gate position_size: Intended $20153.70 exceeds max $20153.6980 (20% of equity)
