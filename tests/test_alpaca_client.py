@@ -90,7 +90,7 @@ def test_list_positions_returns_typed_positions(
 
 def test_get_bars_returns_dataframe(mocker: MockerFixture, client: AlpacaClient) -> None:
     body = _load("alpaca_bars_btc.json")
-    mocker.patch("requests.Session.get", return_value=_mock_response(mocker, 200, body))
+    get_mock = mocker.patch("requests.Session.get", return_value=_mock_response(mocker, 200, body))
 
     df = client.get_bars("BTC/USD", timeframe="1Hour", limit=60)
 
@@ -98,6 +98,11 @@ def test_get_bars_returns_dataframe(mocker: MockerFixture, client: AlpacaClient)
     assert {"open", "high", "low", "close", "volume"}.issubset(df.columns)
     assert len(df) == 60
     assert df["close"].iloc[-1] == 60590
+
+    _, kwargs = get_mock.call_args
+    assert kwargs["params"]["limit"] == 60
+    assert kwargs["params"]["timeframe"] == "1Hour"
+    assert kwargs["params"]["start"].endswith("Z")
 
 
 def test_get_latest_quote_returns_typed_quote(

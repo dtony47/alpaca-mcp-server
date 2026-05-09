@@ -1,6 +1,7 @@
 """Thin HTTP wrapper for Alpaca trading and crypto market-data APIs."""
 
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -115,6 +116,9 @@ class AlpacaClient:
 
     def get_bars(self, symbol: str, timeframe: str = "1Hour", limit: int = 100) -> pd.DataFrame:
         params = {"symbols": symbol, "timeframe": timeframe, "limit": limit}
+        start = self._bars_start(timeframe=timeframe, limit=limit)
+        if start is not None:
+            params["start"] = start
         body = self._get(f"{self._data_url}/v1beta3/crypto/us/bars", params=params)
         bars = body.get("bars", {}).get(symbol, [])
         if not bars:
@@ -209,6 +213,23 @@ class AlpacaClient:
         if resp.status_code >= 400:
             self._raise(resp)
         return resp.json()
+
+    @staticmethod
+    def _bars_start(timeframe: str, limit: int) -> str | None:
+        units = {
+            "1Min": timedelta(minutes=1),
+            "5Min": timedelta(minutes=5),
+            "15Min": timedelta(minutes=15),
+            "1Hour": timedelta(hours=1),
+            "1Day": timedelta(days=1),
+        }
+        delta = units.get(timeframe)
+        if delta is None or limit <= 0:
+            return None
+        # Ask Alpaca for a wide enough lookback window so `limit` is not capped
+        # to the current session/day.
+        start = datetime.now(UTC) - (delta * (limit + 5))
+        return start.isoformat().replace("+00:00", "Z")
 
     @staticmethod
     def _raise(resp: requests.Response) -> None:
