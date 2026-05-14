@@ -51,3 +51,11 @@ Bot scaffolding complete. Trading begins after Plan 1-3 ship and Phase 1 paper r
 - IWM: 1.8148 @ $277.48 (+1.85%)
 - QQQ: 0.769 @ $652.996 (+9.69%)
 - SPY: 0.6865 @ $735.008 (+1.08%)
+
+## Day 7 - 2026-05-14 EOD
+**Phase:** paper | **Equity:** $102910.42 | **Cash:** $53799.02 | **Open positions:** 5 majors
+- AAPL: 19.864918553 @ $251.7 (+18.47%)
+- DOGEUSD: 357158.246478939 @ $0.11085341 (+5.08%)
+- IWM: 1.8148 @ $277.48 (+2.40%)
+- QQQ: 0.769 @ $652.996 (+10.20%)
+- SPY: 0.6865 @ $735.008 (+1.72%)
