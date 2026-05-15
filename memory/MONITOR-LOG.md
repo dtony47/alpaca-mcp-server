@@ -14,3 +14,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-05-09T13:33:41.543185+00:00 - BTC/USD skipped
 - gate position_size: Intended $20153.70 exceeds max $20153.6980 (20% of equity)
+
+## 2026-05-15T11:41:06.480758+00:00 - SOL/USD skipped
+- gate position_count: Already at 6/6 open positions
