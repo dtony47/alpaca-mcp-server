@@ -26,3 +26,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-05-19T19:36:15.983026+00:00 - AVAX/USD skipped
 - gate spread: 0.5544% >= 0.5000%
+
+## 2026-05-20T19:47:00.658381+00:00 - ETH/USD skipped
+- gate position_count: Already at 6/6 open positions
