@@ -59,3 +59,9 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-05-24T12:28:14.362540+00:00 - AVAX/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-05-24T15:28:11.732514+00:00 - DOGE/USD skipped
+- gate position_count: Already at 6/6 open positions
+
+## 2026-05-24T15:28:11.732514+00:00 - LINK/USD skipped
+- gate position_count: Already at 6/6 open positions
