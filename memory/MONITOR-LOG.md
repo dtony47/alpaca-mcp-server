@@ -167,3 +167,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-06-17T20:46:42.170305+00:00 - AVAX/USD skipped
 - gate spread: 0.6072% >= 0.5000%
+
+## 2026-06-20T11:40:52.803009+00:00 - BTC/USD skipped
+- gate position_count: Already at 6/6 open positions
