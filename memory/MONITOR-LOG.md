@@ -194,3 +194,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-06-25T11:59:04.172546+00:00 - AVAX/USD skipped
 - gate spread: 0.6318% >= 0.5000%
+
+## 2026-06-25T16:49:28.074987+00:00 - AVAX/USD skipped
+- gate spread: 0.5640% >= 0.5000%
