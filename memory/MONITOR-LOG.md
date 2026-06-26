@@ -203,3 +203,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-06-26T17:36:39.657343+00:00 - SOL/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-06-26T21:32:29.112808+00:00 - UNI/USD skipped
+- gate position_count: Already at 6/6 open positions
