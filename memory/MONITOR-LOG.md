@@ -257,3 +257,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-07-10T02:58:34.875326+00:00 - DOGE/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-07-13T22:56:23.851979+00:00 - AVAX/USD skipped
+- gate spread: 0.5941% >= 0.5000%
