@@ -263,3 +263,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-07-14T18:02:26.574130+00:00 - UNI/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-07-14T21:57:03.375990+00:00 - AVAX/USD skipped
+- gate spread: 0.5827% >= 0.5000%
