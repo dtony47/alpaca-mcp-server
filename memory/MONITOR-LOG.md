@@ -359,3 +359,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-08-15T14:20:46.924384+00:00 - DOGE/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-08-15T19:20:14.152992+00:00 - ETH/USD skipped
+- gate position_count: Already at 6/6 open positions
