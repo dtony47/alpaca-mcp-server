@@ -413,3 +413,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-08-24T18:38:19.330532+00:00 - LINK/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-08-27T16:06:19.887251+00:00 - BTC/USD skipped
+- gate position_count: Already at 6/6 open positions
