@@ -440,3 +440,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-09-12T01:17:59.779459+00:00 - SOL/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-09-12T05:10:50.730388+00:00 - DOGE/USD skipped
+- gate position_count: Already at 6/6 open positions
