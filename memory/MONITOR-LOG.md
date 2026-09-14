@@ -455,3 +455,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-09-14T16:12:09.832082+00:00 - AVAX/USD skipped
 - gate spread: 0.6139% >= 0.5000%
+
+## 2026-09-14T21:09:30.342981+00:00 - SOL/USD skipped
+- gate position_count: Already at 6/6 open positions
