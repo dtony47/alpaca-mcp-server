@@ -482,3 +482,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-09-17T15:12:12.785050+00:00 - LINK/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-09-17T16:13:36.596076+00:00 - DOGE/USD skipped
+- gate position_count: Already at 6/6 open positions
