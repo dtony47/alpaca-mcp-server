@@ -518,3 +518,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-09-25T14:13:20.698385+00:00 - ETH/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-09-25T16:13:43.026072+00:00 - BTC/USD skipped
+- gate position_count: Already at 6/6 open positions
