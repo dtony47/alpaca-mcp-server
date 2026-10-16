@@ -653,3 +653,12 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-10-16T11:11:01.730566+00:00 - AVAX/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-10-16T12:17:15.527748+00:00 - BTC/USD skipped
+- gate position_count: Already at 6/6 open positions
+
+## 2026-10-16T12:17:15.527748+00:00 - ETH/USD skipped
+- gate position_count: Already at 6/6 open positions
+
+## 2026-10-16T12:17:15.527748+00:00 - LINK/USD skipped
+- gate position_count: Already at 6/6 open positions
