@@ -758,3 +758,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-11-04T07:08:14.655238+00:00 - DOGE/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-11-04T10:08:48.292725+00:00 - BTC/USD skipped
+- gate position_count: Already at 6/6 open positions
