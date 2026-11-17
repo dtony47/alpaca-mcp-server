@@ -818,3 +818,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-11-17T02:10:56.576179+00:00 - BTC/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-11-17T10:07:41.642481+00:00 - SOL/USD skipped
+- gate position_count: Already at 6/6 open positions
