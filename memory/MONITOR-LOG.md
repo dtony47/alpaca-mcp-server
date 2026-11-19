@@ -836,3 +836,6 @@ Empty until the monitor is deployed (Plan 4).
 
 ## 2026-11-19T17:06:31.360299+00:00 - SOL/USD skipped
 - gate position_count: Already at 6/6 open positions
+
+## 2026-11-19T23:05:58.824145+00:00 - ETH/USD skipped
+- gate position_count: Already at 6/6 open positions
