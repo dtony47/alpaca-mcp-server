@@ -1760,3 +1760,12 @@ Bot scaffolding complete. Trading begins after Plan 1-3 ship and Phase 1 paper r
 - LINKUSD: 1916.770293584 @ $0 (+0.00%)
 - QQQ: 0.769 @ $652.996 (-6.82%)
 - SPY: 0.6865 @ $735.008 (-6.15%)
+
+## Day 197 - 2026-11-23 EOD
+**Phase:** paper | **Equity:** $79376.95 | **Cash:** $33488.98 | **Open positions:** 6 majors
+- AAPL: 19.864918553 @ $251.7 (+38.99%)
+- DOGEUSD: 357158.246478939 @ $0 (+0.00%)
+- IWM: 1.8148 @ $277.48 (-4.19%)
+- LINKUSD: 1916.770293584 @ $0 (+0.00%)
+- QQQ: 0.769 @ $652.996 (-0.23%)
+- SPY: 0.6865 @ $735.008 (-1.51%)
